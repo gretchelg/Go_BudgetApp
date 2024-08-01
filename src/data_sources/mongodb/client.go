@@ -48,5 +48,3 @@ func (c *Client) Close() error {
 
 	return c.db.Disconnect(ctx)
 }
-
-//func convertTransaction(txn )

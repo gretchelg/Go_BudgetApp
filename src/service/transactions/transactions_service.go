@@ -17,3 +17,7 @@ func NewService(txnRepo TransactionsRepository) *Service {
 		txnRepo: txnRepo,
 	}
 }
+
+func (s *Service) GetAllTransactions() ([]models.Transaction, error) {
+	return s.txnRepo.GetAllTransactions()
+}
