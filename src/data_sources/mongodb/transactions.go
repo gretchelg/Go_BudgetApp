@@ -2,12 +2,15 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
 
-	"github.com/gretchelg/Go_BudgetApp/src/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+
+	"github.com/gretchelg/Go_BudgetApp/src/models"
 )
 
 // dbTransaction defines a transaction as specified in the DB
@@ -62,6 +65,39 @@ func (c *Client) GetAllTransactions() ([]models.Transaction, error) {
 
 	// respond
 	return results, nil
+}
+
+// GetTransactionByID returns one transaction specified by the given ID
+func (c *Client) GetTransactionByID(id string) (*models.Transaction, error) {
+	// create context used to enforce timeouts
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// create filter that matches the given ID
+	filter := bson.D{
+		{
+			Key:   "tran_id",
+			Value: id,
+		},
+	}
+
+	// do find
+	var aTransaction dbTransaction
+	err := c.transactionsCollection.FindOne(ctx, filter).Decode(&aTransaction)
+	if err == mongo.ErrNoDocuments {
+		// Do something when no record was found
+		//fmt.Println("record does not exist")
+		return nil, fmt.Errorf("DB.GetTransactionByID: %w", models.ErrorNotFound)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	// respond
+	result := convertTransaction(aTransaction)
+	return &result, nil
+
 }
 
 // convertTransaction converts from the internal db model to the application-wide data model.

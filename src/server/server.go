@@ -37,7 +37,8 @@ func (s *Server) Start() error {
 
 	// setup handlers for the transactions-related route
 	transactionsHandler := NewTransactionsHandler(s.svc)
-	r.Get("/transactions", transactionsHandler.GetAllTransactions)
+	r.Get("/api/v1/transaction", transactionsHandler.GetAllTransactions)
+	r.Get("/api/v1/transaction/{tran_id}", transactionsHandler.GetTransactionByID)
 
 	// start listening.
 	log.Print("Listening on :3000...")

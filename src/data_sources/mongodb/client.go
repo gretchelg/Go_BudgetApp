@@ -2,11 +2,12 @@ package mongodb
 
 import (
 	"context"
-	"github.com/gretchelg/Go_BudgetApp/src/workflows"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/gretchelg/Go_BudgetApp/src/workflows"
 )
 
 const (

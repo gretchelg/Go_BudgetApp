@@ -6,6 +6,7 @@ import (
 
 type TransactionsStorage interface {
 	GetAllTransactions() ([]models.Transaction, error)
+	GetTransactionByID(id string) (*models.Transaction, error)
 }
 
 type TransactionsWorkflow struct {
@@ -20,4 +21,8 @@ func NewTransactionsWorkflow(transactionsStorage TransactionsStorage) *Transacti
 
 func (s *TransactionsWorkflow) GetAllTransactions() ([]models.Transaction, error) {
 	return s.transactionsStorage.GetAllTransactions()
+}
+
+func (s *TransactionsWorkflow) GetTransactionByID(id string) (*models.Transaction, error) {
+	return s.transactionsStorage.GetTransactionByID(id)
 }
