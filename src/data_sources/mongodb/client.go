@@ -2,7 +2,7 @@ package mongodb
 
 import (
 	"context"
-	"github.com/gretchelg/Go_BudgetApp/src/service/transactions"
+	"github.com/gretchelg/Go_BudgetApp/src/workflows"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,8 +18,8 @@ type Client struct {
 	transactionsCollection *mongo.Collection
 }
 
-// NewClient returns a DB client that satisfies the TransactionsRepository defined at the service layer
-func NewClient(uri string) (transactions.TransactionsRepository, error) {
+// NewClient returns a DB client that satisfies the TransactionsStorage defined at the service layer
+func NewClient(uri string) (workflows.TransactionsStorage, error) {
 	// create context used to enforce timeouts
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

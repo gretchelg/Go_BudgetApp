@@ -30,10 +30,12 @@ func (s *Server) Start() error {
 	r.Use(middleware.Logger)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("welcome to home page"))
 	})
 
 	//r.Mount("/books", BookRoutes())
+
+	// setup handlers for the transactions-related route
 	transactionsHandler := NewTransactionsHandler(s.svc)
 	r.Get("/transactions", transactionsHandler.GetAllTransactions)
 
@@ -41,23 +43,3 @@ func (s *Server) Start() error {
 	log.Print("Listening on :3000...")
 	return http.ListenAndServe(":3000", r)
 }
-
-// Start starts the server and handles requests over HTTP.
-// It is a blocking call, and will only return control to the caller once server has shut down.
-//func (s *Server) StartBkup() error {
-//	// setup HTTP server + handlers
-//	mux := http.NewServeMux()
-//
-//	finalHandler := http.HandlerFunc(final)
-//	mux.Handle("/", middleware.EnforceJSONHandler(finalHandler))
-//
-//	mux.Handle("/transactions", middleware.EnforceJSONHandler(finalHandler))
-//
-//	// start listening.
-//	log.Print("Listening on :3000...")
-//	return http.ListenAndServe(":3000", mux)
-//}
-
-//func final(w http.ResponseWriter, r *http.Request) {
-//	w.Write([]byte("OK"))
-//}

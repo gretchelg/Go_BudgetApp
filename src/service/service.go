@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/gretchelg/Go_BudgetApp/src/data_sources/mongodb"
 	"github.com/gretchelg/Go_BudgetApp/src/models"
-	"github.com/gretchelg/Go_BudgetApp/src/service/transactions"
+	"github.com/gretchelg/Go_BudgetApp/src/workflows"
 )
 
 // TransactionsRepository defines method required of a Transactions Repository / DB
@@ -12,7 +12,7 @@ type TransactionsRepository interface {
 }
 
 type Service struct {
-	Transactions *transactions.Service
+	Transactions *workflows.TransactionsWorkflow
 }
 
 func NewService(config Config) (*Service, error) {
@@ -23,7 +23,7 @@ func NewService(config Config) (*Service, error) {
 		return nil, err
 	}
 
-	txnsWorkflow := transactions.NewService(db)
+	txnsWorkflow := workflows.NewTransactionsWorkflow(db)
 
 	// respond with ready service
 	return &Service{
