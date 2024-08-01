@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/vrischmann/envconfig"
@@ -22,10 +21,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to initialize service layer: %s", err)
 	}
-
-	// run a test
-	txns, _ := svc.Transactions.GetAllTransactions()
-	fmt.Println(txns)
 
 	// setup HTTP server + handlers
 	svr, err := server.NewServer(svc)
