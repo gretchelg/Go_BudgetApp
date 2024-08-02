@@ -6,8 +6,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/gretchelg/Go_BudgetApp/src/workflows"
 )
 
 const (
@@ -17,10 +15,11 @@ const (
 type Client struct {
 	db                     *mongo.Client
 	transactionsCollection *mongo.Collection
+	usersCollection        *mongo.Collection
 }
 
 // NewClient returns a DB client that satisfies the TransactionsStorage defined at the service layer
-func NewClient(uri string) (workflows.TransactionsStorage, error) {
+func NewClient(uri string) (*Client, error) {
 	// create context used to enforce timeouts
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -33,11 +32,13 @@ func NewClient(uri string) (workflows.TransactionsStorage, error) {
 
 	// define collections
 	txnCollection := mongoDbClient.Database("test").Collection("transactions")
+	usersCollection := mongoDbClient.Database("test").Collection("users")
 
 	// respond
 	return &Client{
 		db:                     mongoDbClient,
 		transactionsCollection: txnCollection,
+		usersCollection:        usersCollection,
 	}, nil
 }
 

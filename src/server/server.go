@@ -40,6 +40,9 @@ func (s *Server) Start() error {
 	r.Get("/api/v1/transaction", transactionsHandler.GetAllTransactions)
 	r.Get("/api/v1/transaction/{tran_id}", transactionsHandler.GetTransactionByID)
 
+	usersHandler := NewUsersHandler(s.svc)
+	r.Get("/api/v1/user", usersHandler.GetAllUsers)
+
 	// start listening.
 	log.Print("Listening on :3000...")
 	return http.ListenAndServe(":3000", r)
