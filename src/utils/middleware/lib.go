@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+// NOTE Unused, below is an example
+
 // EnforceJSONHandler is an example middleware to pattern from
 func EnforceJSONHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

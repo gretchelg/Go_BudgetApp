@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -8,6 +9,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/gretchelg/Go_BudgetApp/src/service"
+)
+
+const (
+	port = 3000
 )
 
 // Server wraps our Service, to expose its functionality over HTTP request/response
@@ -33,17 +38,16 @@ func (s *Server) Start() error {
 		_, _ = w.Write([]byte("welcome to home page"))
 	})
 
-	//r.Mount("/books", BookRoutes())
-
-	// setup handlers for the transactions-related route
+	// setup handlers for the transactions-related routes
 	transactionsHandler := NewTransactionsHandler(s.svc)
 	r.Get("/api/v1/transaction", transactionsHandler.GetAllTransactions)
 	r.Get("/api/v1/transaction/{tran_id}", transactionsHandler.GetTransactionByID)
 
+	// setup handlers for the users-related routes
 	usersHandler := NewUsersHandler(s.svc)
 	r.Get("/api/v1/user", usersHandler.GetAllUsers)
 
 	// start listening.
-	log.Print("Listening on :3000...")
-	return http.ListenAndServe(":3000", r)
+	log.Print(fmt.Sprintf("Listening on :%d...", port))
+	return http.ListenAndServe(fmt.Sprintf(":%d", port), r)
 }

@@ -5,6 +5,9 @@ import (
 	"github.com/gretchelg/Go_BudgetApp/src/workflows"
 )
 
+// Service defines the core service of our app, and provides access to the underlying Workflow functionalities
+// It has no HTTP functionality.
+// See "Server" pkg, which wraps this Service in order to expose its functionalities over HTTP.
 type Service struct {
 	Transactions *workflows.TransactionsWorkflow
 	Users        *workflows.UsersWorkflow
