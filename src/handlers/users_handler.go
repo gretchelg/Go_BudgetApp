@@ -1,4 +1,4 @@
-package server
+package handlers
 
 import (
 	"encoding/json"
@@ -24,7 +24,7 @@ type GetAllUsersResponse struct {
 
 func (h *UsersHandler) GetAllUsers(w http.ResponseWriter, _ *http.Request) {
 	// do get all users
-	users, err := h.svc.Users.GetAllUsers()
+	users, err := h.svc.GetAllUsers()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

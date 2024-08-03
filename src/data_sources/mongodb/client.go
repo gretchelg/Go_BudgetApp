@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"github.com/gretchelg/Go_BudgetApp/src/service"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,30 +14,31 @@ const (
 )
 
 type Client struct {
-	db                     *mongo.Client
+	dbConn                 *mongo.Client
 	transactionsCollection *mongo.Collection
 	usersCollection        *mongo.Collection
 }
 
-// NewClient returns a DB client that satisfies the TransactionsStorage defined at the service layer
-func NewClient(uri string) (*Client, error) {
+// NewClient returns a DB client that satisfies the Storage interface defined at the service layer
+// func NewClient(uri string) (*Client, error) {
+func NewClient(uri string) (service.Storage, error) {
 	// create context used to enforce timeouts
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	// connect to db
-	mongoDbClient, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	dbConnection, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		return nil, err
 	}
 
 	// define collections
-	txnCollection := mongoDbClient.Database("test").Collection("transactions")
-	usersCollection := mongoDbClient.Database("test").Collection("users")
+	txnCollection := dbConnection.Database("test").Collection("transactions")
+	usersCollection := dbConnection.Database("test").Collection("users")
 
 	// respond
 	return &Client{
-		db:                     mongoDbClient,
+		dbConn:                 dbConnection,
 		transactionsCollection: txnCollection,
 		usersCollection:        usersCollection,
 	}, nil
@@ -48,5 +50,5 @@ func (c *Client) Close() error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	return c.db.Disconnect(ctx)
+	return c.dbConn.Disconnect(ctx)
 }

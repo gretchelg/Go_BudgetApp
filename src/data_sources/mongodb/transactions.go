@@ -85,8 +85,8 @@ func (c *Client) GetTransactionByID(id string) (*models.Transaction, error) {
 	var aTransaction dbTransaction
 	err := c.transactionsCollection.FindOne(ctx, filter).Decode(&aTransaction)
 	if err == mongo.ErrNoDocuments {
-		// Do something when no record was found
-		//fmt.Println("record does not exist")
+		// if no matching docs found, return sentinel error "models.ErrorNotFound" that callers can inspect in order to
+		// handle in a custom way, such as returning 404-NotFound rather than a generic 500-InternalServerError
 		return nil, fmt.Errorf("DB.GetTransactionByID: %w", models.ErrorNotFound)
 	}
 

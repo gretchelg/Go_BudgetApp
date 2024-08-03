@@ -78,6 +78,8 @@ func (c *Client) GetUserByEmail(email string) (*models.User, error) {
 	var aUser dbUser
 	err := c.usersCollection.FindOne(ctx, filter).Decode(&aUser)
 	if err == mongo.ErrNoDocuments {
+		// if no matching docs found, return sentinel error "models.ErrorNotFound" that callers can inspect in order to
+		// handle in a custom way, such as returning 404-NotFound rather than a generic 500-InternalServerError
 		return nil, fmt.Errorf("DB.GetUserByEmail: %w", models.ErrorNotFound)
 	}
 
@@ -93,12 +95,6 @@ func (c *Client) GetUserByEmail(email string) (*models.User, error) {
 
 // convertTransaction converts from the internal db model to the application-wide data model.
 func convertUser(dbModel dbUser) models.User {
-	// convert the string TxnAmt field into a proper Float64 value
-	//floatTxnAmt, err := strconv.ParseFloat(dbModel.TranAmount, 64)
-	//if err != nil {
-	//	floatTxnAmt = 0
-	//}
-
 	// response
 	return models.User{
 		Email:       dbModel.Email,

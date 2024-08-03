@@ -1,4 +1,4 @@
-package server
+package handlers
 
 import (
 	"encoding/json"
@@ -27,7 +27,7 @@ type GetAllTransactionsResponse struct {
 
 func (h *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, _ *http.Request) {
 	// do get all txns
-	txns, err := h.svc.Transactions.GetAllTransactions()
+	txns, err := h.svc.GetAllTransactions()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -48,7 +48,7 @@ func (h *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.
 	id := chi.URLParam(r, "tran_id")
 
 	// do get one txn
-	txn, err := h.svc.Transactions.GetTransactionByID(id)
+	txn, err := h.svc.GetTransactionByID(id)
 
 	// check for a specific "record not found" error
 	if errors.Is(err, models.ErrorNotFound) {
@@ -79,7 +79,7 @@ func (h *TransactionsHandler) PostTransaction(w http.ResponseWriter, r *http.Req
 	}
 
 	// do insert
-	err = h.svc.Transactions.InsertTransaction(request)
+	err = h.svc.InsertTransaction(request)
 	if err != nil {
 		errMsg := fmt.Sprintf("insert failed: %s", err.Error())
 		http.Error(w, errMsg, http.StatusInternalServerError)

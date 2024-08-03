@@ -1,32 +1,27 @@
 package service
 
-import (
-	"github.com/gretchelg/Go_BudgetApp/src/data_sources/mongodb"
-	"github.com/gretchelg/Go_BudgetApp/src/workflows"
-)
+import "github.com/gretchelg/Go_BudgetApp/src/models"
 
-// Service defines the core service of our app, and provides access to the underlying Workflow functionalities
-// It has no HTTP functionality.
-// See "Server" pkg, which wraps this Service in order to expose its functionalities over HTTP.
-type Service struct {
-	Transactions *workflows.TransactionsWorkflow
-	Users        *workflows.UsersWorkflow
+// Storage defines methods require of the storage layer (database).
+type Storage interface {
+	// Transactions-related
+	GetAllTransactions() ([]models.Transaction, error)
+	GetTransactionByID(id string) (*models.Transaction, error)
+	InsertTransaction(txn models.Transaction) (string, error)
+
+	// Users-related
+	GetAllUsers() ([]models.User, error)
 }
 
-func NewService(config Config) (*Service, error) {
-	// setup dependencies
-	db, err := mongodb.NewClient(config.MongoURI)
-	if err != nil {
-		return nil, err
-	}
+// Service defines the core service of our app, and provides access to the underlying Workflow functionalities
+// It has no HTTP functionality. See "Server" pkg, which wraps this Service to expose its functionalities over HTTP.
+type Service struct {
+	db Storage
+}
 
-	// setup workflows
-	transactionsWorkflow := workflows.NewTransactionsWorkflow(db)
-	usersWorkflow := workflows.NewUsersWorkflow(db)
-
-	// respond with ready service
+// NewService return an initialized Service
+func NewService(db Storage) *Service {
 	return &Service{
-		Transactions: transactionsWorkflow,
-		Users:        usersWorkflow,
-	}, nil
+		db: db,
+	}
 }
