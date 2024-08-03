@@ -49,6 +49,7 @@ func (s *Server) Start() error {
 	r.Get("/api/v1/user", usersHandler.GetAllUsers)
 
 	// start listening.
-	log.Print(fmt.Sprintf("Listening on :%d...", port))
+
+	log.Print("Listening on port :", port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", port), r)
 }

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/gretchelg/Go_BudgetApp/src/data_sources/mongodb"
-	"github.com/gretchelg/Go_BudgetApp/src/service"
 	"log"
 
 	"github.com/vrischmann/envconfig"
 
+	"github.com/gretchelg/Go_BudgetApp/src/data_sources/mongodb"
 	"github.com/gretchelg/Go_BudgetApp/src/handlers"
+	"github.com/gretchelg/Go_BudgetApp/src/service"
 )
 
 // AppConfig defines the configurations required to run this app

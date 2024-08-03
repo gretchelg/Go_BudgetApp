@@ -127,6 +127,15 @@ func convertTransactionToAppModel(dbModel dbTransaction) models.Transaction {
 		floatTranAmount = 0
 	}
 
+	// ensure TranSign is valid
+	tranSign := models.TranSign(dbModel.TranSign)
+
+	if err := tranSign.Validate(); err != nil {
+
+		// if tranSign is invalid, default to Debit
+		tranSign = models.TranSignDebit
+	}
+
 	// response
 	return models.Transaction{
 		TranID:          dbModel.TranID,
@@ -135,7 +144,7 @@ func convertTransactionToAppModel(dbModel dbTransaction) models.Transaction {
 		TranCurrency:    dbModel.TranCurrency,
 		TranDate:        dbModel.TranDate,
 		TranDescription: dbModel.TranDescription,
-		TranSign:        dbModel.TranSign,
+		TranSign:        tranSign,
 		User:            dbModel.User,
 	}
 }
@@ -153,7 +162,7 @@ func convertTransactionToDBModel(appModel models.Transaction) dbTransaction {
 		TranCurrency:    appModel.TranCurrency,
 		TranDate:        appModel.TranDate,
 		TranDescription: appModel.TranDescription,
-		TranSign:        appModel.TranSign,
+		TranSign:        string(appModel.TranSign),
 		User:            appModel.User,
 	}
 }

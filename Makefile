@@ -4,11 +4,17 @@
 include .env
 export
 
+# install installs any prerequisites and does cleanup
 install:
 	go mod tidy
 
-build: install
+# build creates an executable build at bin/
+build: install lint
 	go build -o bin/
 
-run: install
+run: install lint
 	go run main.go
+
+# lint runs the linter to catch syntax and quality issues
+lint:
+	golangci-lint run

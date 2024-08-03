@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 // Transaction defines a transaction
 // the `bson` tag is useful for mapping to bson-encoded DB systems
@@ -11,6 +13,6 @@ type Transaction struct {
 	TranCurrency    string    `json:"tran_currency" bson:"tran_currency"`
 	TranDate        time.Time `json:"tran_date" bson:"tran_date"`
 	TranDescription string    `json:"tran_description" bson:"tran_description"`
-	TranSign        string    `json:"tran_sign" bson:"tran_sign"`
+	TranSign        TranSign  `json:"tran_sign" bson:"tran_sign"`
 	User            string    `json:"user" bson:"user"`
 }

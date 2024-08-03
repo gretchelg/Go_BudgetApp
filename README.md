@@ -2,6 +2,11 @@
 
 This is the budget app BE
 
+# Prerequisites
+
+1. Golang ([official download](https://go.dev/dl/), [brew](https://formulae.brew.sh/formula/go))
+2. (optional) golangci-lint ([brew](https://formulae.brew.sh/formula/golangci-lint), [official quickstart](https://golangci-lint.run/welcome/quick-start/)) 
+
 # Usage
 
 1. Install Dependencies

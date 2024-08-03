@@ -22,8 +22,8 @@ func (s *Service) InsertTransaction(txn models.Transaction) error {
 		return errors.New("TranCurrency missing")
 	}
 
-	if txn.TranSign == "" {
-		return errors.New("TranSign missing")
+	if err := txn.TranSign.Validate(); err != nil {
+		return err
 	}
 
 	if txn.User == "" {
