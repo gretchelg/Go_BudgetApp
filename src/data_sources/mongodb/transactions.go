@@ -52,7 +52,7 @@ func (c *Client) GetAllTransactions() ([]models.Transaction, error) {
 		}
 
 		// convert the row from an internal db model to the application model
-		aTransaction := convertTransaction(aDbTxn)
+		aTransaction := convertTransactionToAppModel(aDbTxn)
 
 		// append to the list of results
 		results = append(results, aTransaction)
@@ -95,28 +95,65 @@ func (c *Client) GetTransactionByID(id string) (*models.Transaction, error) {
 	}
 
 	// respond
-	result := convertTransaction(aTransaction)
+	result := convertTransactionToAppModel(aTransaction)
 	return &result, nil
-
 }
 
-// convertTransaction converts from the internal db model to the application-wide data model.
-func convertTransaction(dbModel dbTransaction) models.Transaction {
-	// convert the string TxnAmt field into a proper Float64 value
-	floatTxnAmt, err := strconv.ParseFloat(dbModel.TranAmount, 64)
+// InsertTransaction inserts the given transaction into the database. It returns the database ID of the inserted row
+func (c *Client) InsertTransaction(txn models.Transaction) (string, error) {
+	// create context used to enforce timeouts
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// convert from application model to db model
+	dbModelTransaction := convertTransactionToDBModel(txn)
+
+	// do insert
+	res, err := c.transactionsCollection.InsertOne(ctx, dbModelTransaction)
 	if err != nil {
-		floatTxnAmt = 0
+		return "", err
+	}
+
+	// respond
+	id := fmt.Sprintf("%s", res.InsertedID) // get the string representation of the InsertedID object
+	return id, nil
+}
+
+// convertTransactionToAppModel converts from the internal db model to the application-wide data model.
+func convertTransactionToAppModel(dbModel dbTransaction) models.Transaction {
+	// convert the string TranAmount field into a proper Float64 value
+	floatTranAmount, err := strconv.ParseFloat(dbModel.TranAmount, 64)
+	if err != nil {
+		floatTranAmount = 0
 	}
 
 	// response
 	return models.Transaction{
 		TranID:          dbModel.TranID,
 		CategoryName:    dbModel.CategoryName,
-		TranAmount:      floatTxnAmt,
+		TranAmount:      floatTranAmount,
 		TranCurrency:    dbModel.TranCurrency,
 		TranDate:        dbModel.TranDate,
 		TranDescription: dbModel.TranDescription,
 		TranSign:        dbModel.TranSign,
 		User:            dbModel.User,
+	}
+}
+
+// convertTransactionToDBModel converts from the application model to the internal db model
+func convertTransactionToDBModel(appModel models.Transaction) dbTransaction {
+	// convert the float64 TranAmount field into string as specified in the db model
+	strTranAmount := fmt.Sprintf("%f", appModel.TranAmount)
+
+	// response
+	return dbTransaction{
+		TranID:          appModel.TranID,
+		CategoryName:    appModel.CategoryName,
+		TranAmount:      strTranAmount,
+		TranCurrency:    appModel.TranCurrency,
+		TranDate:        appModel.TranDate,
+		TranDescription: appModel.TranDescription,
+		TranSign:        appModel.TranSign,
+		User:            appModel.User,
 	}
 }

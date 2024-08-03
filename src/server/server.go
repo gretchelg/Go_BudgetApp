@@ -42,6 +42,7 @@ func (s *Server) Start() error {
 	transactionsHandler := NewTransactionsHandler(s.svc)
 	r.Get("/api/v1/transaction", transactionsHandler.GetAllTransactions)
 	r.Get("/api/v1/transaction/{tran_id}", transactionsHandler.GetTransactionByID)
+	r.Post("/api/v1/transaction", transactionsHandler.PostTransaction)
 
 	// setup handlers for the users-related routes
 	usersHandler := NewUsersHandler(s.svc)

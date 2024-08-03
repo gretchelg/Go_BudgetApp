@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/gretchelg/Go_BudgetApp/src/models"
 	"github.com/gretchelg/Go_BudgetApp/src/service"
@@ -65,4 +66,26 @@ func (h *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(txn)
+}
+
+func (h *TransactionsHandler) PostTransaction(w http.ResponseWriter, r *http.Request) {
+	// read request body
+	var request models.Transaction
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		errMsg := fmt.Sprintf("unable to decode request body: %s", err.Error())
+		http.Error(w, errMsg, http.StatusBadRequest)
+		return
+	}
+
+	// do insert
+	err = h.svc.Transactions.InsertTransaction(request)
+	if err != nil {
+		errMsg := fmt.Sprintf("insert failed: %s", err.Error())
+		http.Error(w, errMsg, http.StatusInternalServerError)
+		return
+	}
+
+	// respond w/ success
+	w.WriteHeader(http.StatusCreated)
 }

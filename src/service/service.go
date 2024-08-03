@@ -21,12 +21,12 @@ func NewService(config Config) (*Service, error) {
 	}
 
 	// setup workflows
-	txnsWorkflow := workflows.NewTransactionsWorkflow(db)
+	transactionsWorkflow := workflows.NewTransactionsWorkflow(db)
 	usersWorkflow := workflows.NewUsersWorkflow(db)
 
 	// respond with ready service
 	return &Service{
-		Transactions: txnsWorkflow,
+		Transactions: transactionsWorkflow,
 		Users:        usersWorkflow,
 	}, nil
 }
