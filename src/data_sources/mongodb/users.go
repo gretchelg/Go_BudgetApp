@@ -33,19 +33,19 @@ func (d *DBClient) GetAllUsers(ctx context.Context) ([]models.User, error) {
 	}
 	defer cursor.Close(ctxWithTimeout)
 
-	// parse the db call response
+	// parse the db call response.
+	// for each row, convert the data from dbModel to appModel and append to the list of results.
 	var results []models.User
 	for cursor.Next(ctxWithTimeout) {
 
-		//var result bson.D
-		//var result bson.M
+		// parse the db row date into the dbModel
 		var aDbUser dbUser
 		err = cursor.Decode(&aDbUser)
 		if err != nil {
 			return nil, err
 		}
 
-		// convert the row from an internal db model to the application model
+		// convert dbModel to our appModel
 		aUser := convertUser(aDbUser)
 
 		// append to the list of results

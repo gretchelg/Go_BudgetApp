@@ -30,7 +30,10 @@ type GetAllTransactionsResponse struct {
 	Data []models.Transaction `json:"data"`
 }
 
+// GetAllTransactions returns all transactions
 func (t *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, r *http.Request) {
+	//id := r.URL.Query().Get("id")
+
 	// do get all txns
 	ctx := r.Context()
 	txns, err := t.svc.GetAllTransactions(ctx)
@@ -50,7 +53,6 @@ func (t *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, r *http.
 }
 
 func (t *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.Request) {
-	//id := r.URL.Query().Get("id")
 	tranID := chi.URLParam(r, "tran_id")
 
 	// do get one txn

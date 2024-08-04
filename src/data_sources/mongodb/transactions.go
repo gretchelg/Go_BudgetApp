@@ -39,19 +39,19 @@ func (d *DBClient) GetAllTransactions(ctx context.Context) ([]models.Transaction
 	}
 	defer cursor.Close(ctxWithTimeout)
 
-	// parse the db call response
+	// parse the db call response.
+	// for each row, convert the data from dbModel to appModel and append to the list of results.
 	var results []models.Transaction
 	for cursor.Next(ctxWithTimeout) {
 
-		//var result bson.D
-		//var result bson.M
+		// parse the db row date into the dbModel
 		var aDbTxn dbTransaction
 		err = cursor.Decode(&aDbTxn)
 		if err != nil {
 			return nil, err
 		}
 
-		// convert the row from an internal db model to the application model
+		// convert dbModel to our appModel
 		aTransaction := convertTransactionToAppModel(aDbTxn)
 
 		// append to the list of results
