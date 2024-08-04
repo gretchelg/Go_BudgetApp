@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/vrischmann/envconfig"
 
 	"github.com/gretchelg/Go_BudgetApp/src/data_sources/mongodb"
+	"github.com/gretchelg/Go_BudgetApp/src/data_sources/plaid"
 	"github.com/gretchelg/Go_BudgetApp/src/handlers"
 	"github.com/gretchelg/Go_BudgetApp/src/service"
 )
@@ -14,8 +16,9 @@ import (
 type AppConfig struct {
 	MongoURI string
 	Plaid    struct {
-		Secret string
-		Env    string
+		ClientId string
+		Secret   string
+		Env      string
 	}
 }
 
@@ -45,14 +48,25 @@ func main() {
 
 // initService bootstraps the service layer and returns a ready service.
 func initService(config AppConfig) (*service.Service, error) {
-	// setup dependencies
-	db, err := mongodb.NewClient(config.MongoURI)
+	// setup dependencies: database
+	db, err := mongodb.NewDBClient(config.MongoURI)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize DB client: %s", err)
+	}
+
+	// setup dependencies: plaid
+	plaidConfig := plaid.Config{
+		ClientID: config.Plaid.ClientId,
+		Secret:   config.Plaid.Secret,
+	}
+
+	plaidClient, err := plaid.NewPlaidClient(plaidConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize Plaid client: %s", err)
 	}
 
 	// setup service
-	svc := service.NewService(db)
+	svc := service.NewService(db, plaidClient)
 
 	// respond with ready service
 	return svc, nil

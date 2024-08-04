@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"github.com/gretchelg/Go_BudgetApp/src/service"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,15 +13,14 @@ const (
 	timeout = 10 * time.Second
 )
 
-type Client struct {
+type DBClient struct {
 	dbConn                 *mongo.Client
 	transactionsCollection *mongo.Collection
 	usersCollection        *mongo.Collection
 }
 
-// NewClient returns a DB client that satisfies the Storage interface defined at the service layer
-// func NewClient(uri string) (*Client, error) {
-func NewClient(uri string) (*Client, error) {
+// NewDBClient returns a DB client that satisfies the StorageProvider interface defined at the service layer
+func NewDBClient(uri string) (service.StorageProvider, error) {
 	// create context used to enforce timeouts
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -36,18 +36,18 @@ func NewClient(uri string) (*Client, error) {
 	usersCollection := dbConnection.Database("test").Collection("users")
 
 	// respond
-	return &Client{
+	return &DBClient{
 		dbConn:                 dbConnection,
 		transactionsCollection: txnCollection,
 		usersCollection:        usersCollection,
 	}, nil
 }
 
-// Close cleans up after the connection. It should be invoked in a defer clause after Client is instantiated
-func (c *Client) Close() error {
+// Close cleans up after the connection. It should be invoked in a defer clause after DBClient is instantiated
+func (d *DBClient) Close() error {
 	// create context used to enforce timeouts
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	return c.dbConn.Disconnect(ctx)
+	return d.dbConn.Disconnect(ctx)
 }

@@ -20,13 +20,13 @@ type dbUser struct {
 }
 
 // GetAllUsers returns all Users
-func (c *Client) GetAllUsers(ctx context.Context) ([]models.User, error) {
+func (d *DBClient) GetAllUsers(ctx context.Context) ([]models.User, error) {
 	// create context used to enforce timeouts
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	// get all users
-	cursor, err := c.usersCollection.Find(ctxWithTimeout, bson.D{})
+	cursor, err := d.usersCollection.Find(ctxWithTimeout, bson.D{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func (c *Client) GetAllUsers(ctx context.Context) ([]models.User, error) {
 }
 
 // GetUserByEmail returns one user specified by the given email
-func (c *Client) GetUserByEmail(ctx0 context.Context, email string) (*models.User, error) {
+func (d *DBClient) GetUserByEmail(ctx0 context.Context, email string) (*models.User, error) {
 	// create context used to enforce timeouts
 	ctxWithTimeout, cancel := context.WithTimeout(ctx0, timeout)
 	defer cancel()
@@ -76,7 +76,7 @@ func (c *Client) GetUserByEmail(ctx0 context.Context, email string) (*models.Use
 
 	// do find
 	var aUser dbUser
-	err := c.usersCollection.FindOne(ctxWithTimeout, filter).Decode(&aUser)
+	err := d.usersCollection.FindOne(ctxWithTimeout, filter).Decode(&aUser)
 	if err == mongo.ErrNoDocuments {
 		// if no matching docs found, return sentinel error "models.ErrorNotFound" that callers can inspect in order to
 		// handle in a custom way, such as returning 404-NotFound rather than a generic 500-InternalServerError

@@ -6,8 +6,8 @@ import (
 	"github.com/gretchelg/Go_BudgetApp/src/models"
 )
 
-// Storage defines methods require of the storage layer (database).
-type Storage interface {
+// StorageProvider defines methods required of the storage layer (database).
+type StorageProvider interface {
 	// Transactions-related
 	GetAllTransactions(ctx context.Context) ([]models.Transaction, error)
 	GetTransactionByID(ctx context.Context, tranID string) (*models.Transaction, error)
@@ -18,15 +18,22 @@ type Storage interface {
 	GetAllUsers(ctx context.Context) ([]models.User, error)
 }
 
+// BankDetailsProvider defines methods required of external banking integrations provider
+type BankDetailsProvider interface {
+	GetLatestTransactions(ctx context.Context) ([]models.Transaction, error)
+}
+
 // Service defines the core service of our app, and provides access to the underlying Workflow functionalities
 // It has no HTTP functionality. See "Server" pkg, which wraps this Service to expose its functionalities over HTTP.
 type Service struct {
-	db Storage
+	db    StorageProvider
+	banks BankDetailsProvider
 }
 
 // NewService return an initialized Service
-func NewService(db Storage) *Service {
+func NewService(db StorageProvider, banks BankDetailsProvider) *Service {
 	return &Service{
-		db: db,
+		db:    db,
+		banks: banks,
 	}
 }

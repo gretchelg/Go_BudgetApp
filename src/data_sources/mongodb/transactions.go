@@ -27,13 +27,13 @@ type dbTransaction struct {
 }
 
 // GetAllTransactions returns all Transactions
-func (c *Client) GetAllTransactions(ctx context.Context) ([]models.Transaction, error) {
+func (d *DBClient) GetAllTransactions(ctx context.Context) ([]models.Transaction, error) {
 	// create context used to enforce timeouts
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	// get all transactions
-	cursor, err := c.transactionsCollection.Find(ctxWithTimeout, bson.D{})
+	cursor, err := d.transactionsCollection.Find(ctxWithTimeout, bson.D{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,7 +68,7 @@ func (c *Client) GetAllTransactions(ctx context.Context) ([]models.Transaction, 
 }
 
 // GetTransactionByID returns one transaction specified by the given ID
-func (c *Client) GetTransactionByID(ctx context.Context, tranID string) (*models.Transaction, error) {
+func (d *DBClient) GetTransactionByID(ctx context.Context, tranID string) (*models.Transaction, error) {
 	// create context used to enforce timeouts
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -83,7 +83,7 @@ func (c *Client) GetTransactionByID(ctx context.Context, tranID string) (*models
 
 	// do find
 	var aTransaction dbTransaction
-	err := c.transactionsCollection.FindOne(ctxWithTimeout, filter).Decode(&aTransaction)
+	err := d.transactionsCollection.FindOne(ctxWithTimeout, filter).Decode(&aTransaction)
 	if err == mongo.ErrNoDocuments {
 		// if no matching docs found, return sentinel error "models.ErrorNotFound" that callers can inspect in order to
 		// handle in a custom way, such as returning 404-NotFound rather than a generic 500-InternalServerError
@@ -100,7 +100,7 @@ func (c *Client) GetTransactionByID(ctx context.Context, tranID string) (*models
 }
 
 // InsertTransaction inserts the given transaction into the database. It returns the database ID of the inserted row
-func (c *Client) InsertTransaction(ctx context.Context, txn models.Transaction) (string, error) {
+func (d *DBClient) InsertTransaction(ctx context.Context, txn models.Transaction) (string, error) {
 	// create context used to enforce timeouts
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -109,7 +109,7 @@ func (c *Client) InsertTransaction(ctx context.Context, txn models.Transaction) 
 	dbModelTransaction := convertTransactionToDBModel(txn)
 
 	// do insert
-	res, err := c.transactionsCollection.InsertOne(ctxWithTimeout, dbModelTransaction)
+	res, err := d.transactionsCollection.InsertOne(ctxWithTimeout, dbModelTransaction)
 	if err != nil {
 		return "", err
 	}
@@ -121,7 +121,7 @@ func (c *Client) InsertTransaction(ctx context.Context, txn models.Transaction) 
 
 // UpdateTransaction updates the transaction specified by the given ID using the provided transaction details.
 // Only non-empty fields are updated, empty fields remain unchanged
-func (c *Client) UpdateTransaction(ctx context.Context, tranID string, txnDelta models.Transaction) error {
+func (d *DBClient) UpdateTransaction(ctx context.Context, tranID string, txnDelta models.Transaction) error {
 	// create context used to enforce timeouts
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -178,7 +178,7 @@ func (c *Client) UpdateTransaction(ctx context.Context, tranID string, txnDelta 
 	}
 
 	// do update/patch
-	_, err := c.transactionsCollection.UpdateOne(ctxWithTimeout, filter, updates)
+	_, err := d.transactionsCollection.UpdateOne(ctxWithTimeout, filter, updates)
 	if err != nil {
 		return err
 	}
