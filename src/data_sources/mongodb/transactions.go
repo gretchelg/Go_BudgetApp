@@ -27,13 +27,30 @@ type dbTransaction struct {
 }
 
 // GetAllTransactions returns all Transactions
-func (d *DBClient) GetAllTransactions(ctx context.Context) ([]models.Transaction, error) {
+func (d *DBClient) GetAllTransactions(ctx context.Context, filter *models.TransactionsFilter) ([]models.Transaction, error) {
+
 	// create context used to enforce timeouts
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
+	// set filter to narrow results
+	dbFilter := bson.D{}
+
+	if filter != nil {
+		// for each  non-zero-value field, add it to the list of filter fields.
+		filterFields := []bson.E{}
+
+		if filter.User != "" {
+			filterFields = append(filterFields, bson.E{Key: "user", Value: filter.User})
+
+			// TODO: debug issue that it doesn't return consistently. Consider changing db field type from "ObjectID" to plain "string"
+		}
+
+		dbFilter = filterFields
+	}
+
 	// get all transactions
-	cursor, err := d.transactionsCollection.Find(ctxWithTimeout, bson.D{})
+	cursor, err := d.transactionsCollection.Find(ctxWithTimeout, dbFilter)
 	if err != nil {
 		log.Fatal(err)
 	}

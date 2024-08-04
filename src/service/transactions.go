@@ -10,8 +10,9 @@ import (
 	"github.com/gretchelg/Go_BudgetApp/src/utils/random"
 )
 
-func (s *Service) GetAllTransactions(ctx context.Context) ([]models.Transaction, error) {
-	return s.db.GetAllTransactions(ctx)
+// GetAllTransactions returns all transactions. An optional Filter object can be provided to limit the results
+func (s *Service) GetAllTransactions(ctx context.Context, filter *models.TransactionsFilter) ([]models.Transaction, error) {
+	return s.db.GetAllTransactions(ctx, filter)
 }
 
 func (s *Service) GetTransactionByID(ctx context.Context, tranID string) (*models.Transaction, error) {

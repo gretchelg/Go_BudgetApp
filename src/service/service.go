@@ -9,7 +9,7 @@ import (
 // StorageProvider defines methods required of the storage layer (database).
 type StorageProvider interface {
 	// Transactions-related
-	GetAllTransactions(ctx context.Context) ([]models.Transaction, error)
+	GetAllTransactions(ctx context.Context, filter *models.TransactionsFilter) ([]models.Transaction, error)
 	GetTransactionByID(ctx context.Context, tranID string) (*models.Transaction, error)
 	InsertTransaction(ctx context.Context, txn models.Transaction) (string, error)
 	UpdateTransaction(ctx context.Context, tranID string, txn models.Transaction) error

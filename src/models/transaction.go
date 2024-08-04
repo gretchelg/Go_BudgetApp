@@ -16,3 +16,8 @@ type Transaction struct {
 	TranSign        TranSign  `json:"tran_sign" bson:"tran_sign"`
 	User            string    `json:"user" bson:"user"`
 }
+
+// TransactionsFilter defines fields that can be used to filter Transactions when searching
+type TransactionsFilter struct {
+	User string
+}

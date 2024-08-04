@@ -32,11 +32,16 @@ type GetAllTransactionsResponse struct {
 
 // GetAllTransactions returns all transactions
 func (t *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, r *http.Request) {
-	//id := r.URL.Query().Get("id")
+	// get optional filters from the query params
+	user := r.URL.Query().Get("user")
+
+	filter := models.TransactionsFilter{
+		User: user,
+	}
 
 	// do get all txns
 	ctx := r.Context()
-	txns, err := t.svc.GetAllTransactions(ctx)
+	txns, err := t.svc.GetAllTransactions(ctx, &filter)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
