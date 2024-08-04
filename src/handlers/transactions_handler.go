@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
+
 	"github.com/gretchelg/Go_BudgetApp/src/models"
 	"github.com/gretchelg/Go_BudgetApp/src/service"
-	"net/http"
 )
 
 // TransactionsHandler handles all requests related to transactions

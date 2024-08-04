@@ -18,3 +18,7 @@ run: install lint
 # lint runs the linter to catch syntax and quality issues
 lint:
 	golangci-lint run
+
+# test-imports tests the import paths if they follow standards
+test-imports:
+	goimports -l ./..

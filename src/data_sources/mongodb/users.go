@@ -3,10 +3,11 @@ package mongodb
 import (
 	"context"
 	"fmt"
+	"log"
+
 	"github.com/gretchelg/Go_BudgetApp/src/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 )
 
 // dbUser defines a user as specified in the DB

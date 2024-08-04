@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/gretchelg/Go_BudgetApp/src/models"
 	"github.com/gretchelg/Go_BudgetApp/src/service"
-	"net/http"
 )
 
 // UsersHandler handles all requests related to users

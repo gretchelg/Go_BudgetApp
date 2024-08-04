@@ -6,7 +6,8 @@ This is the budget app BE
 
 1. Golang ([official download](https://go.dev/dl/), [brew](https://formulae.brew.sh/formula/go))
 2. (optional) golangci-lint ([brew](https://formulae.brew.sh/formula/golangci-lint),
-[official quickstart](https://golangci-lint.run/welcome/quick-start/)) 
+[official quickstart](https://golangci-lint.run/welcome/quick-start/))
+3. (optional) goimports ([official page](https://pkg.go.dev/golang.org/x/tools/cmd/goimports))
 
 # Usage
 
@@ -36,4 +37,4 @@ Try any of the below
 
 1. Go-Chi is the HTTP server framework used ([official website](https://go-chi.io/#/README),
 [github](https://github.com/go-chi/chi))
-3. mongo-go-driver is the official database driver by MongoDB ([github](https://github.com/mongodb/mongo-go-driver))
+2. mongo-go-driver is the official database driver by MongoDB ([github](https://github.com/mongodb/mongo-go-driver))
