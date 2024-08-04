@@ -15,19 +15,22 @@ type TransactionsHandler struct {
 	svc *service.Service
 }
 
+// NewTransactionsHandler is the constructor for TransactionsHandler, which handles
+// all HTTP request relating to Transactions functionality
 func NewTransactionsHandler(svc *service.Service) *TransactionsHandler {
 	return &TransactionsHandler{
 		svc: svc,
 	}
 }
 
+// GetAllTransactionsResponse defines the schema for GetAllTransactions Response
 type GetAllTransactionsResponse struct {
 	Data []models.Transaction `json:"data"`
 }
 
-func (h *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, _ *http.Request) {
+func (t *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, _ *http.Request) {
 	// do get all txns
-	txns, err := h.svc.GetAllTransactions()
+	txns, err := t.svc.GetAllTransactions()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -43,12 +46,12 @@ func (h *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, _ *http.
 	_ = json.NewEncoder(w).Encode(resp)
 }
 
-func (h *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.Request) {
+func (t *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.Request) {
 	//id := r.URL.Query().Get("id")
 	tranID := chi.URLParam(r, "tran_id")
 
 	// do get one txn
-	txn, err := h.svc.GetTransactionByID(tranID)
+	txn, err := t.svc.GetTransactionByID(tranID)
 
 	// check for a specific "record not found" error
 	if errors.Is(err, models.ErrorNotFound) {
@@ -68,7 +71,12 @@ func (h *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.
 	_ = json.NewEncoder(w).Encode(txn)
 }
 
-func (h *TransactionsHandler) PostTransaction(w http.ResponseWriter, r *http.Request) {
+// PostTransactionResponse defines the schema for the PostTransaction Response
+type PostTransactionResponse struct {
+	TranID string `json:"tran_id"`
+}
+
+func (t *TransactionsHandler) PostTransaction(w http.ResponseWriter, r *http.Request) {
 	// read request body
 	var request models.Transaction
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -79,18 +87,25 @@ func (h *TransactionsHandler) PostTransaction(w http.ResponseWriter, r *http.Req
 	}
 
 	// do insert
-	err = h.svc.InsertTransaction(request)
+	generatedTranID, err := t.svc.InsertTransaction(request)
 	if err != nil {
 		errMsg := fmt.Sprintf("insert failed: %s", err.Error())
 		http.Error(w, errMsg, http.StatusInternalServerError)
 		return
 	}
 
-	// respond w/ success
+	// write response header
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+
+	// write response body
+	resp := PostTransactionResponse{
+		TranID: generatedTranID,
+	}
+	_ = json.NewEncoder(w).Encode(resp)
 }
 
-func (h *TransactionsHandler) PatchTransaction(w http.ResponseWriter, r *http.Request) {
+func (t *TransactionsHandler) PatchTransaction(w http.ResponseWriter, r *http.Request) {
 	// get the tran ID from the url path
 	tranID := chi.URLParam(r, "tran_id")
 
@@ -104,7 +119,7 @@ func (h *TransactionsHandler) PatchTransaction(w http.ResponseWriter, r *http.Re
 	}
 
 	// do update/patch txn
-	err = h.svc.UpdateTransaction(tranID, request)
+	err = t.svc.UpdateTransaction(tranID, request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -153,9 +153,7 @@ func (c *Client) UpdateTransaction(tranID string, txnDelta models.Transaction) e
 		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "tran_currency", Value: dbModelTransaction.TranCurrency})
 	}
 
-	var zeroTime time.Time
-	var unixZeroTime = zeroTime.Unix()
-	if dbModelTransaction.TranDate.Unix() != unixZeroTime {
+	if !dbModelTransaction.TranDate.IsZero() {
 		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "tran_date", Value: dbModelTransaction.TranDate})
 	}
 

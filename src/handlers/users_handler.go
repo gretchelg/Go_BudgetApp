@@ -12,19 +12,22 @@ type UsersHandler struct {
 	svc *service.Service
 }
 
+// NewUsersHandler is the constructor for UsersHandler, which handles
+// all HTTP request relating to Users functionality
 func NewUsersHandler(svc *service.Service) *UsersHandler {
 	return &UsersHandler{
 		svc: svc,
 	}
 }
 
+// GetAllUsersResponse defines the schema for GetAllUsers Response
 type GetAllUsersResponse struct {
 	Data []models.User `json:"data"`
 }
 
-func (h *UsersHandler) GetAllUsers(w http.ResponseWriter, _ *http.Request) {
+func (u *UsersHandler) GetAllUsers(w http.ResponseWriter, _ *http.Request) {
 	// do get all users
-	users, err := h.svc.GetAllUsers()
+	users, err := u.svc.GetAllUsers()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

@@ -16,29 +16,32 @@ func (s *Service) GetTransactionByID(id string) (*models.Transaction, error) {
 	return s.db.GetTransactionByID(id)
 }
 
-func (s *Service) InsertTransaction(txn models.Transaction) error {
+// InsertTransaction inserts the given Transaction into storage, and returns the generated tranID
+func (s *Service) InsertTransaction(txn models.Transaction) (newTranID string, e error) {
 	// validate
 	if txn.TranCurrency == "" {
-		return errors.New("TranCurrency missing")
+		return "", errors.New("TranCurrency missing")
 	}
 
 	if err := txn.TranSign.Validate(); err != nil {
-		return err
+		return "", err
 	}
 
 	if txn.User == "" {
-		return errors.New("field User is missing")
+		return "", errors.New("field User is missing")
 	}
 
 	// supply generated values
 	txn.TranID = generateTranID()
-	txn.TranDate = time.Now() // TODO only generate if empty / zero time
 
-	// TODO return the generated TranID
+	if txn.TranDate.IsZero() {
+		// only generate if empty / zero
+		txn.TranDate = time.Now()
+	}
 
 	// do insert
 	_, err := s.db.InsertTransaction(txn)
-	return err
+	return txn.TranID, err
 }
 
 func (s *Service) UpdateTransaction(tranID string, txn models.Transaction) error {
