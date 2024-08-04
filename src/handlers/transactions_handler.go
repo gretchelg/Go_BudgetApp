@@ -45,10 +45,10 @@ func (h *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, _ *http.
 
 func (h *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.Request) {
 	//id := r.URL.Query().Get("id")
-	id := chi.URLParam(r, "tran_id")
+	tranID := chi.URLParam(r, "tran_id")
 
 	// do get one txn
-	txn, err := h.svc.GetTransactionByID(id)
+	txn, err := h.svc.GetTransactionByID(tranID)
 
 	// check for a specific "record not found" error
 	if errors.Is(err, models.ErrorNotFound) {
@@ -88,4 +88,28 @@ func (h *TransactionsHandler) PostTransaction(w http.ResponseWriter, r *http.Req
 
 	// respond w/ success
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (h *TransactionsHandler) PatchTransaction(w http.ResponseWriter, r *http.Request) {
+	// get the tran ID from the url path
+	tranID := chi.URLParam(r, "tran_id")
+
+	// read request body
+	var request models.Transaction
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		errMsg := fmt.Sprintf("unable to decode request body: %s", err.Error())
+		http.Error(w, errMsg, http.StatusBadRequest)
+		return
+	}
+
+	// do update/patch txn
+	err = h.svc.UpdateTransaction(tranID, request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// respond
+	w.WriteHeader(http.StatusOK)
 }

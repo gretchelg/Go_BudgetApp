@@ -68,7 +68,7 @@ func (c *Client) GetAllTransactions() ([]models.Transaction, error) {
 }
 
 // GetTransactionByID returns one transaction specified by the given ID
-func (c *Client) GetTransactionByID(id string) (*models.Transaction, error) {
+func (c *Client) GetTransactionByID(tranID string) (*models.Transaction, error) {
 	// create context used to enforce timeouts
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -77,7 +77,7 @@ func (c *Client) GetTransactionByID(id string) (*models.Transaction, error) {
 	filter := bson.D{
 		{
 			Key:   "tran_id",
-			Value: id,
+			Value: tranID,
 		},
 	}
 
@@ -117,6 +117,76 @@ func (c *Client) InsertTransaction(txn models.Transaction) (string, error) {
 	// respond
 	id := fmt.Sprintf("%s", res.InsertedID) // get the string representation of the InsertedID object
 	return id, nil
+}
+
+// UpdateTransaction updates the transaction specified by the given ID using the provided transaction details.
+// Only non-empty fields are updated, empty fields remain unchanged
+func (c *Client) UpdateTransaction(tranID string, txnDelta models.Transaction) error {
+	// create context used to enforce timeouts
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// create filter that matches the given ID
+	filter := bson.D{
+		{
+			Key:   "tran_id",
+			Value: tranID,
+		},
+	}
+
+	// convert from application model to db model
+	dbModelTransaction := convertTransactionToDBModel(txnDelta)
+
+	// for each  non-zero-value field, add it to the list of fields to update.
+	// this is to keep other (zero-value fields) unchanged.
+	fieldsToUpdate := []bson.E{}
+
+	if dbModelTransaction.CategoryName != "" {
+		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "category_name", Value: dbModelTransaction.CategoryName})
+	}
+
+	if txnDelta.TranAmount != 0 { // keep this check as the original txnDelta, so we can evaluate as a float
+		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "tran_amount", Value: dbModelTransaction.TranAmount})
+	}
+
+	if dbModelTransaction.TranCurrency != "" {
+		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "tran_currency", Value: dbModelTransaction.TranCurrency})
+	}
+
+	var zeroTime time.Time
+	var unixZeroTime = zeroTime.Unix()
+	if dbModelTransaction.TranDate.Unix() != unixZeroTime {
+		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "tran_date", Value: dbModelTransaction.TranDate})
+	}
+
+	if dbModelTransaction.TranDescription != "" {
+		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "tran_description", Value: dbModelTransaction.TranDescription})
+	}
+
+	if dbModelTransaction.TranSign != "" {
+		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "tran_sign", Value: dbModelTransaction.TranSign})
+	}
+
+	if dbModelTransaction.User != "" {
+		fieldsToUpdate = append(fieldsToUpdate, bson.E{Key: "user", Value: dbModelTransaction.User})
+	}
+
+	// Create the updates object
+	updates := bson.D{
+		{
+			Key:   "$set",
+			Value: fieldsToUpdate,
+		},
+	}
+
+	// do update/patch
+	_, err := c.transactionsCollection.UpdateOne(ctx, filter, updates)
+	if err != nil {
+		return err
+	}
+
+	// respond
+	return nil
 }
 
 // convertTransactionToAppModel converts from the internal db model to the application-wide data model.

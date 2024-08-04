@@ -32,11 +32,29 @@ func (s *Service) InsertTransaction(txn models.Transaction) error {
 
 	// supply generated values
 	txn.TranID = generateTranID()
-	txn.TranDate = time.Now()
+	txn.TranDate = time.Now() // TODO only generate if empty / zero time
+
+	// TODO return the generated TranID
 
 	// do insert
 	_, err := s.db.InsertTransaction(txn)
 	return err
+}
+
+func (s *Service) UpdateTransaction(tranID string, txn models.Transaction) error {
+	// validate
+	if txn.TranSign == "" {
+		// only validate TranSign if we're asked to update it
+		if err := txn.TranSign.Validate(); err != nil {
+			return err
+		}
+	}
+
+	// ensure tranID is consistent
+	txn.TranID = tranID
+
+	// do insert
+	return s.db.UpdateTransaction(tranID, txn)
 }
 
 func generateTranID() string {

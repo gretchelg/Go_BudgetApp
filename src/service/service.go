@@ -6,8 +6,9 @@ import "github.com/gretchelg/Go_BudgetApp/src/models"
 type Storage interface {
 	// Transactions-related
 	GetAllTransactions() ([]models.Transaction, error)
-	GetTransactionByID(id string) (*models.Transaction, error)
+	GetTransactionByID(tranID string) (*models.Transaction, error)
 	InsertTransaction(txn models.Transaction) (string, error)
+	UpdateTransaction(tranID string, txn models.Transaction) error
 
 	// Users-related
 	GetAllUsers() ([]models.User, error)

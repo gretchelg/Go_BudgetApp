@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"github.com/gretchelg/Go_BudgetApp/src/service"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +20,7 @@ type Client struct {
 
 // NewClient returns a DB client that satisfies the Storage interface defined at the service layer
 // func NewClient(uri string) (*Client, error) {
-func NewClient(uri string) (service.Storage, error) {
+func NewClient(uri string) (*Client, error) {
 	// create context used to enforce timeouts
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
