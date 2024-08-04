@@ -25,9 +25,10 @@ type GetAllUsersResponse struct {
 	Data []models.User `json:"data"`
 }
 
-func (u *UsersHandler) GetAllUsers(w http.ResponseWriter, _ *http.Request) {
+func (u *UsersHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	// do get all users
-	users, err := u.svc.GetAllUsers()
+	ctx := r.Context()
+	users, err := u.svc.GetAllUsers(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

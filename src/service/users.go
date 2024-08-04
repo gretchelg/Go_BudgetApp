@@ -1,7 +1,10 @@
 package service
 
-import "github.com/gretchelg/Go_BudgetApp/src/models"
+import (
+	"context"
+	"github.com/gretchelg/Go_BudgetApp/src/models"
+)
 
-func (s *Service) GetAllUsers() ([]models.User, error) {
-	return s.db.GetAllUsers()
+func (s *Service) GetAllUsers(ctx context.Context) ([]models.User, error) {
+	return s.db.GetAllUsers(ctx)
 }

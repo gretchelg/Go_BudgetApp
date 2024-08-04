@@ -1,23 +1,25 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"time"
+
 	"github.com/gretchelg/Go_BudgetApp/src/models"
 	"github.com/gretchelg/Go_BudgetApp/src/utils/random"
-	"time"
 )
 
-func (s *Service) GetAllTransactions() ([]models.Transaction, error) {
-	return s.db.GetAllTransactions()
+func (s *Service) GetAllTransactions(ctx context.Context) ([]models.Transaction, error) {
+	return s.db.GetAllTransactions(ctx)
 }
 
-func (s *Service) GetTransactionByID(id string) (*models.Transaction, error) {
-	return s.db.GetTransactionByID(id)
+func (s *Service) GetTransactionByID(ctx context.Context, tranID string) (*models.Transaction, error) {
+	return s.db.GetTransactionByID(ctx, tranID)
 }
 
 // InsertTransaction inserts the given Transaction into storage, and returns the generated tranID
-func (s *Service) InsertTransaction(txn models.Transaction) (newTranID string, e error) {
+func (s *Service) InsertTransaction(ctx context.Context, txn models.Transaction) (newTranID string, e error) {
 	// validate
 	if txn.TranCurrency == "" {
 		return "", errors.New("TranCurrency missing")
@@ -40,11 +42,11 @@ func (s *Service) InsertTransaction(txn models.Transaction) (newTranID string, e
 	}
 
 	// do insert
-	_, err := s.db.InsertTransaction(txn)
+	_, err := s.db.InsertTransaction(ctx, txn)
 	return txn.TranID, err
 }
 
-func (s *Service) UpdateTransaction(tranID string, txn models.Transaction) error {
+func (s *Service) UpdateTransaction(ctx context.Context, tranID string, txn models.Transaction) error {
 	// validate
 	if txn.TranSign == "" {
 		// only validate TranSign if we're asked to update it
@@ -57,7 +59,7 @@ func (s *Service) UpdateTransaction(tranID string, txn models.Transaction) error
 	txn.TranID = tranID
 
 	// do insert
-	return s.db.UpdateTransaction(tranID, txn)
+	return s.db.UpdateTransaction(ctx, tranID, txn)
 }
 
 func generateTranID() string {

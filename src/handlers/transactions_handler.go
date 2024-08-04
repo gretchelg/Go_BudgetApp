@@ -28,9 +28,10 @@ type GetAllTransactionsResponse struct {
 	Data []models.Transaction `json:"data"`
 }
 
-func (t *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, _ *http.Request) {
+func (t *TransactionsHandler) GetAllTransactions(w http.ResponseWriter, r *http.Request) {
 	// do get all txns
-	txns, err := t.svc.GetAllTransactions()
+	ctx := r.Context()
+	txns, err := t.svc.GetAllTransactions(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -51,7 +52,8 @@ func (t *TransactionsHandler) GetTransactionByID(w http.ResponseWriter, r *http.
 	tranID := chi.URLParam(r, "tran_id")
 
 	// do get one txn
-	txn, err := t.svc.GetTransactionByID(tranID)
+	ctx := r.Context()
+	txn, err := t.svc.GetTransactionByID(ctx, tranID)
 
 	// check for a specific "record not found" error
 	if errors.Is(err, models.ErrorNotFound) {
@@ -87,7 +89,8 @@ func (t *TransactionsHandler) PostTransaction(w http.ResponseWriter, r *http.Req
 	}
 
 	// do insert
-	generatedTranID, err := t.svc.InsertTransaction(request)
+	ctx := r.Context()
+	generatedTranID, err := t.svc.InsertTransaction(ctx, request)
 	if err != nil {
 		errMsg := fmt.Sprintf("insert failed: %s", err.Error())
 		http.Error(w, errMsg, http.StatusInternalServerError)
@@ -119,7 +122,8 @@ func (t *TransactionsHandler) PatchTransaction(w http.ResponseWriter, r *http.Re
 	}
 
 	// do update/patch txn
-	err = t.svc.UpdateTransaction(tranID, request)
+	ctx := r.Context()
+	err = t.svc.UpdateTransaction(ctx, tranID, request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

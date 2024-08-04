@@ -1,17 +1,21 @@
 package service
 
-import "github.com/gretchelg/Go_BudgetApp/src/models"
+import (
+	"context"
+
+	"github.com/gretchelg/Go_BudgetApp/src/models"
+)
 
 // Storage defines methods require of the storage layer (database).
 type Storage interface {
 	// Transactions-related
-	GetAllTransactions() ([]models.Transaction, error)
-	GetTransactionByID(tranID string) (*models.Transaction, error)
-	InsertTransaction(txn models.Transaction) (string, error)
-	UpdateTransaction(tranID string, txn models.Transaction) error
+	GetAllTransactions(ctx context.Context) ([]models.Transaction, error)
+	GetTransactionByID(ctx context.Context, tranID string) (*models.Transaction, error)
+	InsertTransaction(ctx context.Context, txn models.Transaction) (string, error)
+	UpdateTransaction(ctx context.Context, tranID string, txn models.Transaction) error
 
 	// Users-related
-	GetAllUsers() ([]models.User, error)
+	GetAllUsers(ctx context.Context) ([]models.User, error)
 }
 
 // Service defines the core service of our app, and provides access to the underlying Workflow functionalities
